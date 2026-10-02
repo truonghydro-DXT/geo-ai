@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>GIS-GeoAI</title>
+
+  <!-- Leaflet & ExtJS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="styles/header-footer.css"/>
+  <link rel="stylesheet" href="maplibre-gl/maplibre-gl.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Fraunces:opsz,wght@36,500;36,650&display=swap" rel="stylesheet" />
+  <script src="https://cdn.sencha.com/ext/gpl/4.2.1/ext-all.js"></script>
+  <link rel="stylesheet" href="styles/uav-agb.css"/>
+
+  <!-- CSS -->
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-family: "Roboto", sans-serif;
+      background: #fafafa;
+      overflow: hidden;
+    }
+
+
+    /* MAIN */
+    .main {
+      flex: 1;
+      display: flex;
+      height: calc(100vh - 90px);
+      overflow: hidden;
+    }
+
+    .controls {
+      width: 280px;
+      background: #f5f5f5;
+      padding: 15px;
+      border-right: 1px solid #ccc;
+      overflow-y: auto;
+    }
+
+    .controls label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    .controls input,
+    .controls select,
+    .controls button {
+      width: 100%;
+      padding: 6px 8px;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .controls select {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      border: 1px solid gray;
+      border-radius: 4px;
+      background-color: #fff;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23000' d='M0 0h10L5 6z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 10px 6px;
+      padding-right: 28px;
+    }
+
+    .controls button {
+      background: #4caf50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .controls button:hover { background: #43a047; }
+
+     #map {
+      flex: 1;
+      height: 100%;
+    }
+    .info.legend {
+      background: white;
+      padding: 6px 8px;
+      font: 12px Arial, sans-serif;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      border-radius: 5px;
+    }
+
+    #loading-popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(30, 30, 30, 0.4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .popup-box {
+      background: white;
+      padding: 20px 30px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      width: 250px;
+      font-family: Arial, sans-serif;
+    }
+
+    .popup-box h3 {
+      margin-top: 0;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 14px;
+      background: #ddd;
+      border-radius: 7px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #4caf50, #81c784);
+      transition: width 0.4s ease;
+    }
+
+    .progress-text {
+      margin: 0px;
+      color: #444;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .side-label {
+      position: fixed;
+      top: 150px;
+      padding: 6px 12px;
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 4px;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    .side-label-left {
+      left: 300px;
+    }
+
+    .side-label-right {
+      right: 50px;
+    }
+
+    .qh-legend-container {
+      position: relative;
+      transition: transform 0.3s ease;
+      width: 350px;
+    }
+
+    .qh-legend-toggle {
+      position: absolute;
+      top: 10px;
+      left: -25px;
+      width: 25px;
+      height: 25px;
+      background: #f0f0f0;
+      border: 1px solid #ccc;
+      border-right: none;
+      border-radius: 4px 0 0 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qh-legend-panel {
+      max-height: 300px;
+      overflow-y: auto;
+      background: white;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header sẽ được chèn tự động -->
+  
+  <div class="main">
+    <div class="controls">
+      <label style="
+        display:block;
+        font-weight:bold;
+        color:#000;
+        background:#bbeb62;
+        padding:6px 10px;
+        border-radius:6px;
+        margin-top:0px;
+        margin-bottom:12px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+        border:1px solid #a7d454;
+      ">
+        Theo chỉ số viễn thám:
+      </label>
+      
+      <label for="provinceSelect">Tỉnh/Thành phố:</label>
+      <select id="provinceSelect"><option value="">-- Chọn tỉnh --</option></select>
+
+      <label for="districtSelect">Xã/Phường:</label>
+      <select id="districtSelect"><option value="">-- Chọn xã/phường --</option></select>
+
+      <label for="endDate">Thời điểm giám sát:</label>
+      <input type="date" id="endDate" value="2025-09-30">
+
+      <label for="satelliteSelect">Loại ảnh viễn thám:</label>
+      <select id="satelliteSelect">
+        <option value="">-- Chọn loại ảnh --</option>
+        <option value="s1">Sentinel-1</option>
+        <option value="s2">Sentinel-2</option>
+        <option value="planet">PlanetScope</option>
+      </select>
+
+      <label for="indexSelect">Chỉ số viễn thám:</label>
+      <select id="indexSelect">
+        <option value="">-- Lựa chọn chỉ số --</option>
+        <option value="ndvi">NDVI</option>
+        <option value="msavi">MSAVI</option>
+        <option value="ndwi">NDWI</option>
+        <option value="ndre">NDRE</option>
+        <option value="evi">EVI</option>
+        <option value="savi">SAVI</option>
+        <option value="gndvi">GNDVI</option>
+      </select>
+
+      <label for="satelliteDetect">Đối tượng giám sát, cảnh báo:</label>
+      <select id="satelliteDetect">
+        <option value="">-- Chọn đối tượng --</option>
+        <option value="build">Giám sát xây dựng</option>
+        <option value="flood">Giám sát ngập lụt</option>
+        <option value="drought">Cảnh báo hạn hán</option>
+        <!-- <option value="landslide">Cảnh báo sạt lở đất</option> -->
+        <option value="forerest_agb_uav">Sinh khối rừng từ UAV</option>
+        <option value="forerest_agb">Sinh khối rừng từ S2</option>
+        <option value="forerest_fire">Cháy rừng</option>
+        <option value="fire">Biến động rừng</option>
+      </select>
+      <hr>
+      <label style="
+        display:block;
+        font-weight:bold;
+        color:#000;
+        background:#ec7152;
+        padding:6px 10px;
+        border-radius:6px;
+        margin-top:0px;
+        margin-bottom:12px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+        border:1px solid #a7d454;
+      ">
+        Theo mô hình AI:
+      </label>
+      <label>Chọn mô hình AI:</label>
+      <select id="aiType">
+        <option value="GeoAI" selected>GeoAI</option>
+        <option value="TorchGeo">TorchGeo</option>
+      </select>
+
+      <div id="geoaiControls">
+        <label>Chọn module GeoAI:</label>
+        <select id="moduleSelect">
+          <option value="">-- Chọn module --</option>
+        </select>
+      </div>
+
+      <div id="torchgeoControls" style="display:none">
+        <label>Chọn model TorchGeo:</label>
+        <select id="torchModel">
+          <option value="FCN_ResNet50">FCN_ResNet50</option>
+          <option value="FCN_ResNet101">FCN_ResNet101</option>
+          <option value="DeepLabV3_ResNet50">DeepLabV3_ResNet50</option>
+          <option value="DeepLabV3_ResNet101">DeepLabV3_ResNet101</option>
+          <option value="LRASPP_MobileNetV3_Large">LRASPP_MobileNetV3_Large</option>
+        </select>
+
+        <label>Số lớp phân vùng:</label>
+        <input type="number" id="numClasses" value="5" min="2" max="30"/>
+      </div>
+
+      <label>Chọn ảnh vệ tinh:</label>
+      <input type="file" id="satelliteFile" accept=".png,.jpg,.jpeg,.tif,.tiff"/>
+
+      <button id="runModule">Chạy GeoAI</button>
+    </div>
+
+
+    <div id="map"></div>
+
+    <div id="uav-workspace" hidden>
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">AGB từ ảnh UAV</p>
+          <h1>Kết quả sinh khối rừng</h1>
+        </div>
+        <form class="run-form" id="run-form">
+          <label>
+            <span>Input</span>
+            <span class="path-row">
+              <input id="input-path" type="text" spellcheck="false" autocomplete="off" placeholder="Đường dẫn file orthomosaic .tif" />
+              <button id="browse-input-btn" type="button" title="Chọn file GeoTIFF">Chọn</button>
+            </span>
+          </label>
+          <label>
+            <span>Output</span>
+            <span class="path-row">
+              <input id="output-path" type="text" spellcheck="false" autocomplete="off" placeholder="Thư mục ghi kết quả" />
+              <button id="browse-output-btn" type="button" title="Chọn thư mục output">Chọn</button>
+            </span>
+          </label>
+          <div class="run-actions">
+            <span id="run-status"></span>
+            <button id="load-output-btn" type="button">Tải kết quả</button>
+            <button id="run-biomass-btn" type="button">Tính sinh khối</button>
+          </div>
+        </form>
+      </header>
+
+      <section class="kpis" id="kpi-row"></section>
+
+      <main class="workspace">
+        <section class="panel map-panel">
+          <div class="panel-head">
+            <h2>Bản đồ GeoTIFF</h2>
+            <div class="layer-tabs" id="layer-tabs"></div>
+          </div>
+          <p class="layer-note" id="layer-note"></p>
+          <div class="map-tools">
+            <label>Độ mờ lớp TIF
+              <input id="opacity" type="range" min="0" max="100" value="75" />
+            </label>
+            <div class="draw-tools" id="draw-tools">
+              <button id="draw-polygon-btn" type="button">Vẽ vùng AGB</button>
+              <button id="finish-polygon-btn" type="button" disabled>Hoàn thành</button>
+              <button id="clear-polygon-btn" type="button" disabled>Xóa vùng</button>
+              <span class="tool-split" aria-hidden="true"></span>
+              <button id="measure-btn" type="button">Đo chiều dài</button>
+              <button id="finish-measure-btn" type="button" disabled>Xong đo</button>
+              <button id="clear-measure-btn" type="button" disabled>Xóa đo</button>
+            </div>
+          </div>
+          <div class="map-stage">
+            <div id="uav-map"></div>
+            <span id="map-value" class="map-value"></span>
+            <aside id="map-legend" class="map-legend" hidden></aside>
+            <div class="agb-floats">
+              <aside id="polygon-stats" class="polygon-stats" hidden></aside>
+              <aside id="measure-stats" class="polygon-stats" hidden></aside>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel grid-panel">
+          <div class="panel-head">
+            <h2>Lưới 1 ha</h2>
+            <label class="metric-pick">
+              Màu theo
+              <select id="grid-metric">
+                <option value="agb_Mg_ha">AGB (Mg/ha)</option>
+                <option value="canopy_cover_pct">Che phủ tán (%)</option>
+                <option value="large_crown_area_pct">Tán lớn (%)</option>
+              </select>
+            </label>
+          </div>
+          <div class="grid-wrap">
+            <div class="grid-canvas-box">
+              <canvas id="ha-grid" width="520" height="460"></canvas>
+            </div>
+            <aside class="cell-card" id="cell-card">
+              <p>Chọn một ô trên lưới để xem chi tiết.</p>
+            </aside>
+          </div>
+          <div class="legend" id="grid-legend"></div>
+          <section class="table-fold">
+            <h3>Bảng ô 1 ha</h3>
+            <div class="table-toolbar">
+              <input id="table-filter" type="search" placeholder="Lọc theo hàng, cột hoặc AGB…" />
+            </div>
+            <div class="table-scroll">
+              <table id="ha-table">
+                <thead>
+                  <tr>
+                    <th data-sort="row">Hàng</th>
+                    <th data-sort="col">Cột</th>
+                    <th data-sort="lon">Kinh độ</th>
+                    <th data-sort="lat">Vĩ độ</th>
+                    <th data-sort="canopy_cover_pct">Che phủ (%)</th>
+                    <th data-sort="agb_Mg_ha">AGB (Mg/ha)</th>
+                    <th data-sort="large_crown_area_pct">Tán lớn (%)</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Footer sẽ được chèn tự động -->
+  <footer id="footer"></footer>
+
+  <!-- Scripts -->
+  <script src="mapshow/leaflet.js"></script>
+  <script src="mapshow/georaster-layer-for-leaflet.min.js"></script>
+  <script src="mapshow/leaflet-side-by-side.min.js"></script>
+  <script src="maplibre-gl/maplibre-gl.js"></script>
+  <script src="maplibre-gl/leaflet-maplibre-gl.js"></script>
+  <script src="mapshow/image_sattellite.js"></script>
+  <script src="mapshow/index_satellite.js"></script>
+  <script src="mapshow/popup_index.js"></script>
+  <script src="mapshow/image_detect.js"></script>
+  <script src="mapshow/change_lulc.js"></script>
+  <script src="mapshow/flood_map.js"></script>
+  <script src="mapshow/drought_map.js"></script>
+  <script src="mapshow/agri_map.js"></script>
+  <script src="mapshow/forerest_map.js"></script>
+  <script src="mapshow/forerest_fire.js"></script>
+  <script src="mapshow/forset_agb.js"></script>
+  <script src="mapshow/uav_agb.js"></script>
+  <script src="mapshow/landside.js"></script>
+  <script src="script_search.js"></script>
+  <script src="main.js"></script>
+
+  <!-- Thêm file header/footer -->
+  <script src="app-header-footer-main-index.js"></script>
+</body>
+</html>

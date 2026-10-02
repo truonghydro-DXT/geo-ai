@@ -1,0 +1,69 @@
+#datepicker {
+    /* position: absolute; */
+    width: 100vw; /* Chiều rộng bằng với viewport width */
+    max-width: 210%; /* Giới hạn chiều rộng tối đa là 100% của phần tử cha */ 
+    bottom: 0px; /* Điều chỉnh khoảng cách với phía dưới (có thể thay đổi giá trị này) */
+    left: 0px; /* Đưa nút vào giữa theo chiều ngang */
+    transform: translateX(0%); /* Dịch chuyển nút về giữa theo chiều ngang */
+    background-color: #ffffff; /* Đảm bảo nút được hiển thị trên nền trắng */
+    padding: 0px; /* Tăng khoảng cách giữa các thành phần bên trong nút */
+    border-radius: 5px; /* Bo tròn viền cho nút */
+    /* box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1); Đổ bóng cho nút */
+
+}
+.custom-label {
+    min-width: 100px; /* Độ rộng tối thiểu của nhãn */
+    text-align: right; /* Căn chỉnh văn bản sang phải */
+    padding-right: 5px; /* Khoảng cách phía bên phải */
+    margin-top: 10px; /* Khoảng cách từ nhãn đến vùng nhập */
+}
+.form-text {
+    width: 150px; /* Độ rộng mong muốn */
+}
+.logo_temp {
+    margin-top: 5px; /* Đặt khoảng cách dưới cho div đầu tiên */
+    margin-right: 30px; /* Đặt khoảng cách dưới cho div đầu tiên */
+}
+/* Đặt chiều rộng cho select box */
+.select-box {
+    width: 100%; /* Đặt chiều rộng tùy ý */
+    max-width: 300px; /* Giới hạn chiều rộng tối đa */
+    padding: 8px; /* Tùy chỉnh khoảng cách nếu cần */
+}
+
+/* Áp dụng cho các select box trong form */
+#userName, #permission {
+    width: 100%;
+    max-width: 1200px;
+    padding: 8px;
+}
+.toggle-password {
+    cursor: pointer;
+}
+
+.toggle-password.active {
+    color: #007bff; /* Màu sắc khi password đang được hiển thị */
+}
+
+/* CSS để căn chỉnh các option trong select box */
+#screenCheckboxes {
+    display: flex;
+    flex-wrap: wrap; /* Cho phép các phần tử con xuống dòng khi không đủ không gian */
+}
+
+.form-check {
+    flex: 1 1 500px; /* Độ rộng cố định cho mỗi checkbox */
+    margin-right: 20px; /* Khoảng cách giữa các checkbox */
+}
+
+.table-actions a {
+    text-decoration: none; /* Loại bỏ gạch chân */
+}
+
+.table-actions a .icon-copy {
+    color: currentColor; /* Sử dụng màu của liên kết làm màu biểu tượng */
+}
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}

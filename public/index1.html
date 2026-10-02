@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- Basic Page Info -->
+		<meta charset="utf-8" />
+		<title>LIFETEX-GeoAI</title>
+
+		<!-- Site favicon -->
+		<link
+			rel="apple-touch-icon"
+			sizes="180x180"
+			href="images/Logo.png"
+		/>
+		<link
+			rel="icon"
+			type="image/png"
+			sizes="32x32"
+			href="images/Icon.png"
+		/>
+		<link
+			rel="icon"
+			type="image/png"
+			sizes="16x16"
+			href="images/Icon.png"
+		/>
+
+		<!-- Mobile Specific Metas -->
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1, maximum-scale=1"
+		/>
+
+		<!-- CSS -->
+		<link rel="stylesheet" type="text/css" href="styles/core.css" />
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="styles/icon-font.min.css"
+		/>
+		<link rel="stylesheet" type="text/css" href="styles/style.css" />
+
+	</head>
+	<body class="login-page">
+		<div class="login-header box-shadow">
+			<div
+				class="container-fluid d-flex justify-content-between align-items-center"
+			>
+				<div class="brand-logo">
+					<a href="login.html">
+						<img src="images/Logo.png" alt="" />
+					</a>
+				</div>
+				<div class="login-menu">
+					<ul>
+						<li><a href="register.html">Register</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div
+			class="login-wrap d-flex align-items-center flex-wrap justify-content-center"
+		>
+			<div class="container">
+				<div class="row align-items-center">
+					<div class="col-md-6 col-lg-7">
+						<img src="images/login-page-img.png" alt="" />
+					</div>
+					<div class="col-md-6 col-lg-5">
+						<div class="login-box bg-white box-shadow border-radius-10">
+							<div class="login-title">
+								<h2 class="text-center text-primary">Login</h2>
+							</div>
+							<form id="loginForm">
+								<div class="input-group custom">
+									<input type="text" id="usernameid" class="form-control form-control-lg"
+										placeholder="Username" required>
+									<div class="input-group-append custom">
+										<span class="input-group-text"><i class="icon-copy dw dw-user1"></i></span>
+									</div>
+								</div>
+								<div class="input-group custom">
+									<input type="password" id="password" class="form-control form-control-lg" placeholder="**********" required>
+									<div class="input-group-append custom">
+										<span class="input-group-text toggle-password">
+											<i class="dw dw-eye"></i>
+										</span>
+									</div>
+								</div>
+								<!-- <div class="input-group custom">
+									<input type="password" id="password" class="form-control form-control-lg"
+										placeholder="**********" required>
+									<div class="input-group-append custom">
+										<span class="input-group-text"><i class="dw dw-padlock1"></i></span>
+									</div>
+								</div> -->
+								<div class="row pb-30">
+									<div class="col-6">
+										<div class="custom-control custom-checkbox">
+											<input type="checkbox" class="custom-control-input" id="customCheck1">
+											<label class="custom-control-label" for="customCheck1">Remember</label>
+										</div>
+									</div>
+									<div class="col-6">
+										<div class="forgot-password">
+											<a href="forgot-password.html">Forgot Password</a>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-sm-12">
+										<div class="input-group mb-0">
+											<button type="submit" id = "id-login" class="btn btn-primary btn-lg btn-block">Sign In</button>
+										</div>
+										<div class="font-16 weight-600 pt-10 pb-10 text-center" data-color="#000080">OR
+										</div>
+										<div class="input-group mb-0">
+											<a href="register.html" class="btn btn-outline-primary btn-lg btn-block">Register
+												To Create Account</a>
+										</div>
+									</div>
+								</div>
+							</form>
+
+							<!--  -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	
+		<!-- welcome modal end -->
+		<!-- js -->
+		<script src="app-core.js"></script>
+		<script src="app-process.js"></script>
+		<script src="app-login_manager.js"></script>
+		<!-- <script src="vendors/scripts/runTask.js"defer></script> -->
+		
+	</body>
+</html>

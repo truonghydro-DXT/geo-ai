@@ -1,0 +1,23 @@
+parameter,value
+input,D:\WORK\AGB-UAV\data\orthomosaic.tif
+crs,EPSG:4326 (WGS 84)
+origin_lon,105.67704064658503
+origin_lat,21.126800592202702
+pixel_size_cm,3.422
+extent_width_m,927.04
+extent_height_m,832.4
+mapped_area_ha,54.752
+vegetated_area_ha,29.951
+mean_canopy_cover_pct,54.7
+mean_agb_Mg_ha,124.77
+min_agb_Mg_ha,0.0
+max_agb_Mg_ha,288.0
+total_agb_Mg,6831.59
+total_carbon_Mg,3210.85
+agb_closed_Mg_ha,240.0
+cover_exponent,1.48
+exg_threshold,0.16
+vari_threshold,0.08
+used_tiles,7316
+elapsed_s,144.7
+equation,AGB = 240.0 * FCC^1.48 * vigor(VARI); FCC from ExG/VARI canopy mask

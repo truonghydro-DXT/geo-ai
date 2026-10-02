@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>GIS-GeoAI</title>
+
+  <!-- Leaflet & ExtJS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+   <link rel="stylesheet" href="styles/header-footer.css"/>
+  <script src="https://cdn.sencha.com/ext/gpl/4.2.1/ext-all.js"></script>
+
+  <!-- CSS -->
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-family: "Roboto", sans-serif;
+      background: #fafafa;
+      overflow: hidden;
+    }
+
+
+    /* MAIN */
+    .main {
+      flex: 1;
+      display: flex;
+      height: calc(100vh - 90px);
+      overflow: hidden;
+    }
+
+    .controls {
+      width: 260px;
+      background: #f5f5f5;
+      padding: 15px;
+      border-right: 1px solid #ccc;
+      overflow-y: auto;
+    }
+
+    .controls label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    .controls input,
+    .controls select,
+    .controls button {
+      width: 100%;
+      padding: 6px 8px;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .controls button {
+      background: #4caf50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .controls button:hover { background: #43a047; }
+
+     #map {
+      flex: 1;
+      height: 100%;
+    }
+    .info.legend {
+      background: white;
+      padding: 6px 8px;
+      font: 12px Arial, sans-serif;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      border-radius: 5px;
+    }
+
+    #loading-popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(30, 30, 30, 0.4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .popup-box {
+      background: white;
+      padding: 20px 30px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      width: 250px;
+      font-family: Arial, sans-serif;
+    }
+
+    .popup-box h3 {
+      margin-top: 0;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 14px;
+      background: #ddd;
+      border-radius: 7px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #4caf50, #81c784);
+      transition: width 0.4s ease;
+    }
+
+    .progress-text {
+      margin: 0px;
+      color: #444;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .side-label {
+      position: fixed;
+      top: 150px;
+      padding: 6px 12px;
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 4px;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    .side-label-left {
+      left: 300px;
+    }
+
+    .side-label-right {
+      right: 50px;
+    }
+
+    .qh-legend-container {
+      position: relative;
+      transition: transform 0.3s ease;
+      width: 350px;
+    }
+
+    .qh-legend-toggle {
+      position: absolute;
+      top: 10px;
+      left: -25px;
+      width: 25px;
+      height: 25px;
+      background: #f0f0f0;
+      border: 1px solid #ccc;
+      border-right: none;
+      border-radius: 4px 0 0 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qh-legend-panel {
+      max-height: 300px;
+      overflow-y: auto;
+      background: white;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header sẽ được chèn tự động -->
+  
+  <div class="main">
+    <div class="controls">
+      <label for="provinceSelect">Tỉnh/Thành phố:</label>
+      <select id="provinceSelect"><option value="">-- Chọn tỉnh --</option></select>
+
+      <label for="districtSelect">Xã/Phường:</label>
+      <select id="districtSelect" multiple><option value="">-- Chọn xã/phường --</option></select>
+
+      <label for="endDate">Thời điểm giám sát:</label>
+      <input type="date" id="endDate" value="2025-09-30">
+
+      <label for="satelliteSelect">Loại ảnh viễn thám:</label>
+      <select id="satelliteSelect">
+        <option value="">-- Chọn loại ảnh --</option>
+        <option value="s1">Sentinel-1</option>
+        <option value="s2">Sentinel-2</option>
+        <option value="planet">PlanetScope</option>
+      </select>
+
+      <label for="indexSelect">Chỉ số viễn thám:</label>
+      <select id="indexSelect">
+        <option value="">-- Lựa chọn chỉ số --</option>
+        <option value="ndvi">NDVI</option>
+        <option value="msavi">MSAVI</option>
+        <option value="ndwi">NDWI</option>
+        <option value="ndre">NDRE</option>
+        <option value="evi">EVI</option>
+        <option value="savi">SAVI</option>
+        <option value="gndvi">GNDVI</option>
+      </select>
+
+      <label for="satelliteDetect">Đối tượng giám sát:</label>
+      <select id="satelliteDetect">
+        <option value="">-- Chọn đối tượng --</option>
+        <option value="build">Giám sát xây dựng</option>
+        <option value="flood">Giám sát ngập lụt</option>
+      </select>
+
+      <label for="satelliteWarning">Cảnh báo:</label>
+      <select id="satelliteWarning">
+        <option value="">-- Chọn loại cảnh báo --</option>
+        <option value="drough">Hạn hán</option>
+        <option value="forerest_fire">Cháy rừng</option>
+        <option value="fire">Biến động rừng</option>
+      </select>
+    </div>
+    <div id="map"></div>
+  </div>
+
+  <!-- Footer sẽ được chèn tự động -->
+  <footer id="footer"></footer>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="mapshow/leaflet-side-by-side.min.js"></script>
+  <script src="mapshow/image_sattellite.js"></script>
+  <script src="mapshow/index_satellite.js"></script>
+  <script src="mapshow/popup_index.js"></script>
+  <script src="mapshow/image_detect.js"></script>
+  <script src="script_search.js"></script>
+  <script src="main.js"></script>
+
+  <!-- Thêm file header/footer -->
+  <script src="app-header-footer-main.js"></script>
+</body>
+</html>

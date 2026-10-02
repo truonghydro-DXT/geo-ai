@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AGB-UAV</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Fraunces:opsz,wght@36,500;36,650&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/vendor/leaflet.css?v=4" />
+    <link rel="stylesheet" href="/static/styles.css?v=24" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">DeepLiDARPlanet</p>
+        <h1>Kết quả sinh khối rừng</h1>
+      </div>
+      <form class="run-form" id="run-form">
+        <label>
+          <span>Input</span>
+          <span class="path-row">
+            <input id="input-path" type="text" spellcheck="false" autocomplete="off" placeholder="Đường dẫn file orthomosaic .tif" />
+            <button id="browse-input-btn" type="button" title="Chọn file GeoTIFF">Chọn</button>
+          </span>
+        </label>
+        <label>
+          <span>Output</span>
+          <span class="path-row">
+            <input id="output-path" type="text" spellcheck="false" autocomplete="off" placeholder="Thư mục ghi kết quả" />
+            <button id="browse-output-btn" type="button" title="Chọn thư mục output">Chọn</button>
+          </span>
+        </label>
+        <div class="run-actions">
+          <span id="run-status"></span>
+          <button id="load-output-btn" type="button">Tải kết quả</button>
+          <button id="run-biomass-btn" type="button">Tính sinh khối</button>
+        </div>
+      </form>
+    </header>
+
+    <section class="kpis" id="kpi-row"></section>
+
+    <main class="workspace">
+      <section class="panel map-panel">
+        <div class="panel-head">
+          <h2>Bản đồ GeoTIFF</h2>
+          <div class="layer-tabs" id="layer-tabs"></div>
+        </div>
+        <p class="layer-note" id="layer-note"></p>
+        <div class="map-tools">
+          <label>Độ mờ lớp TIF
+            <input id="opacity" type="range" min="0" max="100" value="75" />
+          </label>
+          <div class="draw-tools" id="draw-tools" hidden>
+            <button id="draw-polygon-btn" type="button">Vẽ vùng AGB</button>
+            <button id="finish-polygon-btn" type="button" disabled>Hoàn thành</button>
+            <button id="clear-polygon-btn" type="button" disabled>Xóa vùng</button>
+            <span class="tool-split" aria-hidden="true"></span>
+            <button id="measure-btn" type="button">Đo chiều dài</button>
+            <button id="finish-measure-btn" type="button" disabled>Xong đo</button>
+            <button id="clear-measure-btn" type="button" disabled>Xóa đo</button>
+          </div>
+        </div>
+        <div class="map-stage">
+          <div id="map"></div>
+          <span id="map-value" class="map-value">Click bản đồ để đọc giá trị pixel TIF</span>
+          <aside id="map-legend" class="map-legend" hidden></aside>
+          <div class="agb-floats">
+            <aside id="polygon-stats" class="polygon-stats" hidden></aside>
+            <aside id="measure-stats" class="polygon-stats" hidden></aside>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel grid-panel">
+        <div class="panel-head">
+          <h2>Lưới 1 ha</h2>
+          <label class="metric-pick">
+            Màu theo
+            <select id="grid-metric">
+              <option value="agb_Mg_ha">AGB (Mg/ha)</option>
+              <option value="canopy_cover_pct">Che phủ tán (%)</option>
+              <option value="large_crown_area_pct">Tán lớn (%)</option>
+            </select>
+          </label>
+        </div>
+        <div class="grid-wrap">
+          <div class="grid-canvas-box">
+            <canvas id="ha-grid" width="520" height="460"></canvas>
+          </div>
+          <aside class="cell-card" id="cell-card">
+            <p>Chọn một ô trên lưới để xem chi tiết.</p>
+          </aside>
+        </div>
+        <div class="legend" id="grid-legend"></div>
+        <section class="table-fold">
+          <h3>Bảng ô 1 ha</h3>
+          <div class="table-toolbar">
+            <input id="table-filter" type="search" placeholder="Lọc theo hàng, cột hoặc AGB…" />
+          </div>
+          <div class="table-scroll">
+            <table id="ha-table">
+              <thead>
+                <tr>
+                  <th data-sort="row">Hàng</th>
+                  <th data-sort="col">Cột</th>
+                  <th data-sort="lon">Kinh độ</th>
+                  <th data-sort="lat">Vĩ độ</th>
+                  <th data-sort="canopy_cover_pct">Che phủ (%)</th>
+                  <th data-sort="agb_Mg_ha">AGB (Mg/ha)</th>
+                  <th data-sort="large_crown_area_pct">Tán lớn (%)</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="/static/vendor/leaflet.js?v=4"></script>
+    <script src="/static/app.js?v=24"></script>
+  </body>
+</html>
